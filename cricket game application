@@ -1,0 +1,579 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <limits>
+using namespace std;
+
+class Player
+{
+    public :
+
+        Player(); // this default constructor will initialize all the attributes when object is made
+
+        string name; // we use std as its not recommended in header files to write "using name space std;"
+        int id; // represents the unique index of each player
+        int runsScored; // runs scored by the player while batting
+        int ballsPlayed; // balls faced by the player while batting
+        int ballsBowled; // balls bowled by the player while bowled
+        int runsGiven; // runs given by the bowler to the batsman
+        int wicketTaken; // total wickets taken in an innings
+};
+
+class Team
+{
+    public :
+        Team();
+
+        string name;
+        int totalRunsScored;
+        int wicketsLost;
+        int totalBallsBowled; // this will also be equal to the total number of bowls played by the batting team
+        vector<Player> players_vector; // stores all the objects of type player; so ones we initialize the player object, we will add it to this vector
+
+};
+
+class Game
+{
+    public :
+        Game();
+
+        Team teamA, teamB; // these Team objects will represent the two teams in the match
+        Team *battingTeam, *bowlingTeam;
+        Player *batsman, *bowler;
+        bool isFirstInnings; // will help to know which inning is going on !
+
+        int playerPerTeam;
+        int maxBalls;
+        int totalPlayers;
+        string players[11];
+
+        void welcome();
+        void showPlayers();
+        int takeIntegerInput();
+        void selectPlayers();
+        bool validateSelectedlayer(int);
+        void showTeamPlayers();
+        void toss();
+        void tossChoice(Team);
+        void startFirstInnings();
+        void initializePlayers();
+        void playInnings();
+        void bat();
+        bool validateInnings();
+        void showGameScorecard();
+        void startSecondInnings();
+        void showMatchSummary();
+};
+
+Player :: Player() // initializing all attributes with 0 at start !
+{
+    runsScored = 0;
+    runsGiven = 0;
+    ballsBowled = 0;
+    ballsPlayed = 0;
+    wicketTaken = 0;
+}
+
+Team :: Team()
+{
+    totalBallsBowled = 0;
+    totalRunsScored = 0;
+    wicketsLost = 0;
+}
+
+Game :: Game()
+{
+    isFirstInnings = false; // initially this will be false but when the first innings will start, will be true
+    teamA.name = "Team-A";
+    teamB.name = "Team-B";
+
+    playerPerTeam = 4;
+    maxBalls = 6;
+    totalPlayers = 11;
+
+    players[0] = "Shukla";
+    players[1] = "Rawte";
+    players[2] = "Patel";
+    players[3] = "Musk";
+    players[4] = "Ambani";
+    players[5] = "Bezoz";
+    players[6] = "Modi";
+    players[7] = "Gupta";
+    players[8] = "Khadayta";
+    players[9] = "Chanchlani";
+    players[10] = "Binod";
+}
+
+void Game :: welcome()
+{
+    cout<<"\n";
+    cout<<"\n";
+    cout<<"\n";
+
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+    cout<<"\t\t\t |                                                 | "<<endl;
+    cout<<"\t\t\t |                                                 | "<<endl;
+    cout<<"\t\t\t |            ~ Welcome To CRIC-IN ~               | "<<endl;
+    cout<<"\t\t\t |                                                 | "<<endl;
+    cout<<"\t\t\t |                                                 | "<<endl;
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+
+    cout<<"\n";
+    cout<<"\n";
+    cout<<"\n";
+
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+    cout<<"\t\t\t |                  Instructions                   | "<<endl;
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+    cout<<"\t\t\t |  1. Create 2 teams with 4 players each from     | "<<endl;
+    cout<<"\t\t\t |     given 11 players.                           | "<<endl;
+    cout<<"\t\t\t |                                                 | "<<endl;
+    cout<<"\t\t\t |  2. Lead the toss and decide the choice of play.| "<<endl;
+    cout<<"\t\t\t |                                                 | "<<endl;
+    cout<<"\t\t\t |  3. Each innings will be of 6 balls.            | "<<endl;
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+    
+    cout<<"\n";
+    cout<<"\n";
+    cout<<"\n";
+}
+
+void Game::showPlayers()
+{
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+    cout<<"\t\t\t |                 List of Players                 | "<<endl;
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+
+    cout<<"\n";
+
+    for(int i=0;i<totalPlayers;i++)
+    {
+        cout<<"\t\t\t\t\t   ["<<i<<"]"<<" "<<players[i]<<endl;
+    }
+
+    cout<<"\n";
+    cout<<"\n";
+    cout<<"\n";
+}
+
+int Game ::takeIntegerInput()
+{
+    int n;
+
+    while(!(cin>>n)) // this whole expression will return a boolean
+    {
+        cin.clear(); // if the user enters an invalid inputs, it will generate error flags internally and this function clears those error flags !
+
+        // A temporary storage area is called a buffer. ... In standard C/C++, streams are buffered, for example in the case of standard input, when we press the key on the keyboard, it isn't sent to your program, rather it is buffered by the operating system till the time is allotted to that program.            
+
+        // now this memory needs to be cleard as it will affect the decision of the while loops condtion so we use /-
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        // this function takes two parameters, the first one will remove all unwanted data includeing the newline character in the end which is present as the second parameter 
+
+        cout<<"\t\t\t\t\tINVALID INPUT ! Please try again with a valid input : ";
+    }
+
+    return n;
+}
+
+bool Game :: validateSelectedlayer(int index)
+{
+    int n;
+    vector<Player> players;
+
+    players = teamA.players_vector;
+    n = players.size(); // returns the number of elements in the vector 
+    for(int i=0;i<n;i++)
+    {
+        if(players[i].id == index)
+        {
+            return false;
+        }
+    }
+
+    players = teamB.players_vector;
+    n = players.size(); // returns the number of elements in the vector 
+    for(int i=0;i<n;i++)
+    {
+        if(players[i].id == index)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void Game ::selectPlayers() // this function selects the players for both the teams  
+{
+
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+    cout<<"\t\t\t |           Create Team-A and Team-B              | "<<endl;
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+
+    cout<<"\n";
+
+    // for Team-A
+    for(int i=0;i<playerPerTeam;i++) // loop to take Team-A's players
+    {
+        cout<<"\n";
+
+        teamAselection :
+        cout<<"\t\t\t\tSelect player "<<i+1<<" of Team-A : ";
+
+        int playerIndexTeamA = takeIntegerInput(); // this will return the chosen (integer) index
+        if(playerIndexTeamA < 0 || playerIndexTeamA > 10)
+        {
+            cout<<"\t\t\t\tPlease select from the given players \n";
+            goto teamAselection;        
+        }
+
+        else if(!(validateSelectedlayer(playerIndexTeamA))) // this checks if the player is already selected or not 
+        {
+            cout<<"\t\t\t\tPlayer already Selected, Please select another player \n";
+            goto teamAselection;
+        }
+
+        else
+        {
+            Player teamAplayer; // now making an object of class Player 
+            teamAplayer.name = players[playerIndexTeamA]; // giving the name to the player stored in the array correspoinding to its index !
+            teamAplayer.id = playerIndexTeamA;
+            teamA.players_vector.push_back(teamAplayer); // A Vecotr is just like a list or an array, we can push_back(add) elements or delete them , here we are adding a player in teamA's vector; here teamAplayer
+        }
+    }
+
+    // for Team-B
+    for(int i=0;i<playerPerTeam;i++)
+    {
+        cout<<"\n";
+
+        teamBselection :
+        cout<<"\t\t\t\tSelect player "<<i+1<<" of Team-B : ";
+
+        int playerIndexTeamB = takeIntegerInput();
+        if(playerIndexTeamB < 0 || playerIndexTeamB > 10)
+        {
+            cout<<"\t\t\t\tPlease select from the given players \n";
+            goto teamBselection;
+        }
+
+        else if(!(validateSelectedlayer(playerIndexTeamB)))
+        {
+            cout<<"\t\t\t\tPlayer already Selected, Please select another player \n";
+            goto teamBselection;
+        }
+
+        else
+        {
+            Player teamBplayer;
+            teamBplayer.name = players[playerIndexTeamB];
+            teamBplayer.id = playerIndexTeamB;
+            teamB.players_vector.push_back(teamBplayer);
+        }
+    }
+}
+
+void Game::showTeamPlayers()
+{
+    vector<Player> allTeamAplayers = teamA.players_vector;
+    vector<Player> allTeamBplayers = teamB.players_vector;
+
+    cout<<"\n";
+    cout<<"\t\t|-----------------------| \t\t |-----------------------| \n";
+    cout<<"\t\t|        Team-A         | \t\t |        Team-B         | \n";
+    cout<<"\t\t|-----------------------| \t\t |-----------------------| \n";
+
+    for(int i=0;i<playerPerTeam;i++)
+    {
+        cout<<"\t\t|\t"<<"["<<i<<"] "<<allTeamAplayers[i].name<<"\t|\t\t "
+            <<"|\t"<<"["<<i<<"] "<<allTeamBplayers[i].name<<"\t | \n";
+    }
+    cout<<"\t\t|-----------------------| \t\t |-----------------------| \n";
+
+    cout<<"\n";
+    cout<<"\n";
+    cout<<"\n";
+}
+
+void Game::toss()
+{
+    cout<<"\n";
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+    cout<<"\t\t\t |                   Let's Toss                    | "<<endl;
+    cout<<"\t\t\t |-------------------------------------------------| "<<endl;
+    cout<<"\n";
+    cout<<"\t\t\t\t\t<< Tossing the coin >>\n";
+    cout<<"\n";
+
+    srand(time(NULL));
+    int randomValue = rand() % 2;// can only be 1 or 0 
+
+    if(randomValue)
+    {
+        cout<<"\t\t\t\t\tTeam-A won the toss !\n"; 
+        tossChoice(teamA);       
+    }
+
+    else
+    {
+        cout<<"\t\t\t\t\tTeam-B won the toss ! \n";
+        tossChoice(teamB);       
+    }
+}
+
+void Game::tossChoice(Team tossWinnerTeam)
+{
+    cout<<"\t\t\t\tEnter 1. to bat or 2. to bowl first : \n";
+    int tossInput = takeIntegerInput();
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // clearing the input buffer
+
+    if(tossInput == 1)
+    {
+        cout<<"\t\t\t\t"<<tossWinnerTeam.name<<" won the toss and choose to bat first \n";
+        
+        if(tossWinnerTeam.name.compare("Team-A") == 0) // Team-A won the toss
+        {
+            battingTeam = &teamA;
+            bowlingTeam = &teamB;
+        }
+
+        else // Team-B won the toss
+        {
+            battingTeam = &teamB;
+            bowlingTeam = &teamA;
+        }
+    }
+
+    else if(tossInput == 2)
+    {
+        cout<<"\t\t\t\t"<<tossWinnerTeam.name<<" won the toss and choose to bowl first \n";
+        
+        if(tossWinnerTeam.name.compare("Team-A") == 0) // Team-A won the toss
+        {
+            bowlingTeam = &teamA;
+            battingTeam = &teamB;
+        }
+
+        else // Team-B won the toss
+        {
+            bowlingTeam = &teamB;
+            battingTeam = &teamA;
+        }
+    }
+
+    else
+    {
+        cout<<"\t\t\t\t\tInvalid Input !, Please try again : \n";
+        tossChoice(tossWinnerTeam);
+    }
+}
+
+void Game::startFirstInnings()
+{
+    cout<<"\n";
+
+    cout<<"\t\t\t\t\t |||| FIRST INNINGS STARTS |||| \n";
+    isFirstInnings = true;
+
+    initializePlayers();
+    playInnings();
+}
+
+void Game::startSecondInnings()
+{
+    cout<<"\t\t\t\t\t |||| SECOND INNINGS STARTS |||| \n";
+    
+    isFirstInnings = false;
+
+    Team tempTeam = *battingTeam;
+    *battingTeam = *bowlingTeam;
+    *bowlingTeam = tempTeam;
+
+    initializePlayers();
+    playInnings();
+}
+
+void Game::initializePlayers()
+{
+    batsman = &battingTeam->players_vector[0];
+    bowler = &bowlingTeam->players_vector[0];
+
+    cout<<"\n";
+
+    cout<<"\t\t\t\t\t"<<battingTeam->name<<" - "<<batsman->name<<" is batting !\n";
+    cout<<"\t\t\t\t\t"<<bowlingTeam->name<<" - "<<bowler->name<<" is bowling ! \n";
+}
+
+void Game::playInnings()
+{
+    for(int i=0;i<maxBalls;i++)
+    {
+        cout<<"\t\t\t\t\tPress Enter to Bowl >>> ";
+        getchar();
+        cout<<"\t\t\t\t\t\tBowling Now ...! \n";
+        bat();
+
+        if(!validateInnings())
+        {
+            break;
+        }
+    }
+}
+
+void Game::bat()
+{
+    srand(time(NULL));
+    int runsScored = rand() % 7;
+
+    // updating batting team and batsman's score 
+
+    batsman->runsScored = batsman->runsScored + runsScored;
+    battingTeam->totalRunsScored = battingTeam->totalRunsScored + runsScored;
+    batsman->ballsPlayed = batsman->ballsPlayed + 1;
+
+    // updating bowling team and bowler's score 
+
+    bowler->ballsBowled = bowler->ballsBowled + 1;
+    bowlingTeam->totalBallsBowled = bowlingTeam->totalBallsBowled + 1;
+    bowler->runsGiven = bowler->runsGiven + runsScored;
+
+    cout<<"\n";
+    if(runsScored != 0)
+    {
+        cout<<"\t\t\t\t"<<bowler->name<<" to "<<batsman->name<<" "<<runsScored<<" runs ! \n";
+        showGameScorecard();
+    }
+
+    else
+    {
+        cout<<"\t\t\t\t"<<bowler->name<<" to "<<batsman->name<<" "<<"OUT ! \n";
+
+        battingTeam->wicketsLost = battingTeam->wicketsLost + 1;
+        bowler->wicketTaken = bowler->wicketTaken + 1;
+
+        showGameScorecard();
+
+        int nextPlayerIndex = battingTeam->wicketsLost;
+        batsman = &battingTeam->players_vector[nextPlayerIndex];
+    }
+}
+
+bool Game::validateInnings()
+{
+    if(isFirstInnings)
+    {
+        if(battingTeam->wicketsLost == playerPerTeam||bowlingTeam->totalBallsBowled == maxBalls)
+        {
+            cout<<"\t\t\t\t |||| FIRST INNINGS ENDS |||| \n";
+
+            cout<<battingTeam->name<<" "<<battingTeam->totalRunsScored<<" - "<<battingTeam->wicketsLost<<" {"<<bowlingTeam->totalBallsBowled<<"} \n";
+
+            cout<<bowlingTeam->name<<" needs "<<battingTeam->totalRunsScored + 1<<" runs to win the match ! \n";
+            
+            return false;
+        }
+    }
+
+    else // Second Innings 
+    {
+        if(battingTeam->totalRunsScored > bowlingTeam->totalRunsScored)
+        {
+            cout<<battingTeam->name<<" WON THE MATCH ! \n";
+            return false;
+        }
+
+        else if(battingTeam->wicketsLost == playerPerTeam || bowlingTeam->totalBallsBowled == maxBalls)
+        {
+            if(bowlingTeam->totalRunsScored > battingTeam->totalRunsScored)
+            {
+                cout<<bowlingTeam->name<<" WON THE MATCH ! \n";
+            }
+
+            else 
+            {
+                cout<<"MATCH DRAW ! \n";
+            }
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void Game::showGameScorecard()
+{
+    cout<<"\t|--------------------------------------------------------------------|\n";
+        cout<<"\t|"<<battingTeam->name<<" "<<battingTeam->totalRunsScored<<"-"<<battingTeam->wicketsLost<<" ("<<bowlingTeam->totalBallsBowled<<") | "<<batsman->name<<" ("<<batsman->ballsPlayed<<") \t"<<bowler->name<<" "<<bowler->ballsBowled<<"-"<<bowler->runsGiven<<"-"<<bowler->wicketTaken<<"| \n";
+    cout<<"\t|--------------------------------------------------------------------|\n";
+}
+
+void Game::showMatchSummary()
+{
+    cout<<"\t\t\t |||| MATCH ENDS |||| \n";
+
+    cout<<battingTeam->name<<" "<<battingTeam->totalRunsScored<<"-"<<battingTeam->wicketsLost<<" ("<<bowlingTeam->totalBallsBowled<<") \n";
+
+    cout<<"|=====================================================| \n";
+    cout<<"| PLAYER \t BATTING \t BOWLING | \n";
+    
+    for(int i=0;i<playerPerTeam;i++)
+    {
+        Player player = battingTeam->players_vector[i];
+        cout<<"|-----------------------------------------------------| \n";
+        cout<<" ["<<i<<"] "<<player.name<<" \t"<<player.runsScored<<" ("<<player.ballsPlayed<<") \t\t"<<player.ballsBowled<<"-"<<player.runsGiven<<"-"<<player.wicketTaken<<"\t | \n";
+        cout<<"|-----------------------------------------------------| \n";
+    }
+
+    cout<<"|=====================================================| \n";
+
+    cout<<bowlingTeam->name<<" "<<bowlingTeam->totalRunsScored<<"-"<<bowlingTeam->wicketsLost<<" ("<<battingTeam->totalBallsBowled<<") \n";
+
+    cout<<"|=====================================================| \n";
+    cout<<"| PLAYER \t BATTING \t BOWLING | \n";
+    
+    for(int i=0;i<playerPerTeam;i++)
+    {
+        Player player = bowlingTeam->players_vector[i];
+        cout<<"|-----------------------------------------------------| \n";
+        cout<<" ["<<i<<"] "<<player.name<<" \t"<<player.runsScored<<" ("<<player.ballsPlayed<<") \t\t"<<player.ballsBowled<<"-"<<player.runsGiven<<"-"<<player.wicketTaken<<"\t | \n";
+        cout<<"|-----------------------------------------------------| \n";
+    }
+    cout<<"|=====================================================| \n"; 
+}
+
+
+int main()
+{
+    Game g1;
+    g1.welcome();
+
+    cout<<"\t\t\t\t\tPress Enter to Continue \n ";
+    getchar();  // this function will wait for the user to press Enter; As the Enter key is equivalent to a newline character, so this will wait for a character by the user including the newline character i.e the Enter Key !
+
+    g1.showPlayers();
+    // g1.takeIntegerInput();
+
+    cout<<"\t\t\t\t\tPress Enter to Continue \n ";
+    getchar();
+
+    g1.selectPlayers();
+    g1.showTeamPlayers();
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // clearing the input buffer
+
+    cout<<"\t\t\t\t\tPress Enter to Continue \n ";
+    getchar();
+
+    g1.toss();
+
+    g1.startFirstInnings();
+    g1.startSecondInnings();
+    g1.showMatchSummary();
+
+    return 0;
+}
